@@ -7,9 +7,10 @@ import AnimatedSection from "@/components/AnimatedSection";
 import LikeButton from "@/components/LikeButton";
 import SubscribeForm from "@/components/SubscribeForm";
 import { skills, projects } from "@/lib/data";
-import { Code, Server, Wrench } from "lucide-react";
+import { Code, Server, Wrench, ArrowRight, Images } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRight as faArrowRightSolid } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import { ArrowRight, Images } from "lucide-react";
 
 // Lazy-load the heavy canvas hero
 const InteractiveHero = dynamic(() => import("@/components/InteractiveHero"), {
@@ -43,7 +44,7 @@ export default function Home() {
             href="/projects"
             className="link-underline mt-6 inline-flex items-center gap-1.5 py-1 text-sm font-medium text-primary"
           >
-            View all projects <ArrowRight size={14} />
+            View all projects <FontAwesomeIcon icon={faArrowRightSolid} className="h-3 w-3" />
           </Link>
         </Section>
       </AnimatedSection>

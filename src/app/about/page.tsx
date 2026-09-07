@@ -23,6 +23,8 @@ import {
   faFish,
   faBookOpen,
   faRocket,
+  faHand,
+  faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 import Image from "next/image";
@@ -44,7 +46,6 @@ export default function AboutPage() {
                   className="object-cover"
                   priority
                 />
-                {/* Fallback initials if no photo */}
                 <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-text-muted">
                   CK
                 </div>
@@ -59,8 +60,12 @@ export default function AboutPage() {
                 </p>
               </AnimatedSection>
               <AnimatedSection delay={0.1}>
-                <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
-                  Hey, I&apos;m Carlson 👋
+                <h1 className="mt-3 flex items-center gap-3 text-4xl font-bold tracking-tight sm:text-5xl">
+                  Hey, I&apos;m Carlson
+                  <FontAwesomeIcon
+                    icon={faHand}
+                    className="text-3xl text-primary sm:text-4xl"
+                  />
                 </h1>
               </AnimatedSection>
               <AnimatedSection delay={0.15}>
@@ -230,7 +235,7 @@ export default function AboutPage() {
               href="/contact"
               className="mt-6 inline-flex items-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-medium text-white transition-all hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
             >
-              Say hello <span>→</span>
+              Say hello <FontAwesomeIcon icon={faArrowRight} className="h-3.5 w-3.5" />
             </Link>
           </AnimatedSection>
         </div>

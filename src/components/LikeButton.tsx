@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 
 export default function LikeButton() {
   const [count, setCount] = useState(0);
@@ -28,7 +31,17 @@ export default function LikeButton() {
           transition={{ type: "spring", stiffness: 500, damping: 15 }}
           className="inline-block"
         >
-          {count > 0 ? "💖" : "🤍"}
+          {count > 0 ? (
+            <FontAwesomeIcon
+              icon={faHeartSolid}
+              className="h-4 w-4 text-rose-500"
+            />
+          ) : (
+            <FontAwesomeIcon
+              icon={faHeart}
+              className="h-4 w-4 text-text-muted transition-colors group-hover:text-rose-400"
+            />
+          )}
         </motion.span>
       </AnimatePresence>
       <span className="text-text-muted transition-colors group-hover:text-primary">

@@ -66,7 +66,7 @@ export async function POST(request: Request) {
     }
   }
 
-  return NextResponse.json({ message: "Subscribed successfully! 🎉" });
+  return NextResponse.json({ message: "Subscribed successfully!" });
 }
 
 // DELETE — unsubscribe

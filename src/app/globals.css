@@ -14,12 +14,12 @@
 
 /* ─── Dark mode overrides ─── */
 .dark {
-  --color-surface: #0f172a;
-  --color-surface-alt: #1e293b;
+  --color-surface: #0a0f1a;
+  --color-surface-alt: #111827;
   --color-surface-dark: #020617;
   --color-text: #f1f5f9;
   --color-text-muted: #94a3b8;
-  --color-border: #334155;
+  --color-border: #1e293b;
 }
 
 html {
@@ -28,7 +28,18 @@ html {
 
 body {
   @apply bg-surface text-text antialiased;
-  transition: background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ─── Selection color ─── */
+::selection {
+  background-color: rgba(37, 99, 235, 0.2);
+  color: inherit;
+}
+
+.dark ::selection {
+  background-color: rgba(96, 165, 250, 0.25);
 }
 
 /* ─── Animated link underline (Josh Comeau inspired) ─── */
@@ -39,7 +50,7 @@ body {
   background-size: 0% 2px;
   background-position: 0 100%;
   background-repeat: no-repeat;
-  transition: background-size 0.3s ease;
+  transition: background-size 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .link-underline:hover {
@@ -61,18 +72,18 @@ body {
   height: 200%;
   background: radial-gradient(
     circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(37, 99, 235, 0.08) 0%,
+    rgba(37, 99, 235, 0.06) 0%,
     transparent 50%
   );
   opacity: 0;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.4s ease;
   pointer-events: none;
 }
 
 .dark .glow-card::before {
   background: radial-gradient(
     circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
-    rgba(96, 165, 250, 0.1) 0%,
+    rgba(96, 165, 250, 0.08) 0%,
     transparent 50%
   );
 }
@@ -116,4 +127,52 @@ body {
 
 .animate-float {
   animation: float 3s ease-in-out infinite;
+}
+
+/* ─── Smooth scrollbar ─── */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-muted);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* ─── Focus styles ─── */
+*:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ─── Reduced motion ─── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  html {
+    scroll-behavior: auto;
+  }
 }

@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Mail, Check, Loader2, Users } from "lucide-react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
 
 export default function SubscribeForm() {
   const [email, setEmail] = useState("");
@@ -80,7 +82,7 @@ export default function SubscribeForm() {
               </motion.span>
             ) : status === "success" ? (
               <motion.span key="done" initial={{ scale: 0 }} animate={{ scale: 1 }}>
-                <Check size={16} />
+                <FontAwesomeIcon icon={faCheck} className="h-4 w-4" />
               </motion.span>
             ) : (
               <motion.span key="mail" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
@@ -97,13 +99,14 @@ export default function SubscribeForm() {
       </form>
 
       {status === "success" && (
-        <motion.p
+        <motion.div
           initial={{ opacity: 0, y: 4 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-3 text-center text-sm text-green-600"
+          className="mt-3 flex items-center justify-center gap-2 text-sm text-green-600"
         >
-          Welcome aboard! 🎉
-        </motion.p>
+          <FontAwesomeIcon icon={faCheck} className="h-3.5 w-3.5" />
+          Welcome aboard!
+        </motion.div>
       )}
       {status === "error" && (
         <p className="mt-3 text-center text-sm text-red-500">
