@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -14,7 +11,16 @@ export async function POST(request: Request) {
     );
   }
 
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    console.warn("RESEND_API_KEY not set — skipping email send");
+    return NextResponse.json({ success: true, skipped: true });
+  }
+
   try {
+    const { Resend } = await import("resend");
+    const resend = new Resend(apiKey);
+
     await resend.emails.send({
       from: "Portfolio <onboarding@resend.dev>",
       to: process.env.CONTACT_EMAIL ?? "kingoina254@gmail.com",
