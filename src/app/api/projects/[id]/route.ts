@@ -1,20 +1,15 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 interface Params {
   params: Promise<{ id: string }>;
 }
 
-// GET — single project
 export async function GET(_request: Request, { params }: Params) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
-  const { data, error } = await supabase
-    .from("projects")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const { data, error } = await supabase.from("projects").select("*").eq("id", id).single();
 
   if (error || !data) {
     return NextResponse.json({ error: "Project not found." }, { status: 404 });
@@ -23,13 +18,12 @@ export async function GET(_request: Request, { params }: Params) {
   return NextResponse.json({ project: data });
 }
 
-// PUT — update project
 export async function PUT(request: Request, { params }: Params) {
   const { id } = await params;
   const body = await request.json();
   const { title, description, tags, live_url, github_url, image_url, featured, sort_order } = body;
 
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { data, error } = await supabase
     .from("projects")
@@ -48,23 +42,16 @@ export async function PUT(request: Request, { params }: Params) {
     .select()
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ project: data });
 }
 
-// DELETE — remove project
 export async function DELETE(_request: Request, { params }: Params) {
   const { id } = await params;
-  const supabase = await createClient();
+  const supabase = createAdminClient();
 
   const { error } = await supabase.from("projects").delete().eq("id", id);
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ message: "Project deleted." });
 }

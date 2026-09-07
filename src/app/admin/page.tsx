@@ -5,17 +5,20 @@ import { motion } from "framer-motion";
 import {
   FolderOpen,
   ImageIcon,
-  Mail,
-  Settings,
   MessageSquare,
+  Settings,
   Trash2,
   Check,
-  X,
   ExternalLink,
   Loader2,
+  Lock,
+  LogOut,
+  Upload,
 } from "lucide-react";
 
 type Tab = "projects" | "gallery" | "messages" | "settings";
+
+const ADMIN_PASSWORD = "carlson2024"; // Change this to something secret
 
 interface Project {
   id: string;
@@ -24,7 +27,9 @@ interface Project {
   tags: string[];
   live_url: string | null;
   github_url: string | null;
+  image_url: string | null;
   featured: boolean;
+  sort_order: number;
   created_at: string;
 }
 
@@ -57,24 +62,37 @@ const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function AdminPage() {
+  const [authenticated, setAuthenticated] = useState(false);
+  const [passwordInput, setPasswordInput] = useState("");
+  const [passwordError, setPasswordError] = useState(false);
+
   const [activeTab, setActiveTab] = useState<Tab>("projects");
   const [loading, setLoading] = useState(true);
 
-  // Data
   const [projects, setProjects] = useState<Project[]>([]);
   const [images, setImages] = useState<GalleryImage[]>([]);
   const [messages, setMessages] = useState<Message[]>([]);
   const [settings, setSettings] = useState<Settings>({});
 
-  // Forms
-  const [projectForm, setProjectForm] = useState({ title: "", description: "", tags: "", live_url: "", github_url: "", featured: false });
+  const [projectForm, setProjectForm] = useState({ title: "", description: "", tags: "", live_url: "", github_url: "", image_url: "", featured: false });
   const [imageForm, setImageForm] = useState({ title: "", url: "", category: "general" });
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
-    loadData(activeTab);
-  }, [activeTab]);
+    if (authenticated) loadData(activeTab);
+  }, [activeTab, authenticated]);
+
+  function handleLogin(e: React.FormEvent) {
+    e.preventDefault();
+    if (passwordInput === ADMIN_PASSWORD) {
+      setAuthenticated(true);
+      setPasswordError(false);
+    } else {
+      setPasswordError(true);
+    }
+  }
 
   async function loadData(tab: Tab) {
     setLoading(true);
@@ -96,15 +114,39 @@ export default function AdminPage() {
         const data = await res.json();
         setSettings(data.settings ?? {});
       }
-    } catch {
-      // silently fail
-    }
+    } catch { /* silent */ }
     setLoading(false);
   }
 
   function showToast(msg: string) {
     setToast(msg);
     setTimeout(() => setToast(null), 3000);
+  }
+
+  async function uploadFile(file: File): Promise<string | null> {
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("bucket", "images");
+
+    const res = await fetch("/api/upload", { method: "POST", body: formData });
+    const data = await res.json();
+    setUploading(false);
+
+    if (data.url) return data.url;
+    showToast(data.error || "Upload failed");
+    return null;
+  }
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const url = await uploadFile(file);
+    if (url) {
+      setImageForm((f) => ({ ...f, url }));
+      showToast("Image uploaded! Now add a title and save.");
+    }
   }
 
   async function addProject(e: React.FormEvent) {
@@ -119,12 +161,10 @@ export default function AdminPage() {
           tags: projectForm.tags.split(",").map((t) => t.trim()).filter(Boolean),
         }),
       });
-      setProjectForm({ title: "", description: "", tags: "", live_url: "", github_url: "", featured: false });
+      setProjectForm({ title: "", description: "", tags: "", live_url: "", github_url: "", image_url: "", featured: false });
       showToast("Project added!");
       loadData("projects");
-    } catch {
-      showToast("Failed to add project");
-    }
+    } catch { showToast("Failed to add project"); }
     setSaving(false);
   }
 
@@ -147,9 +187,7 @@ export default function AdminPage() {
       setImageForm({ title: "", url: "", category: "general" });
       showToast("Image added!");
       loadData("gallery");
-    } catch {
-      showToast("Failed to add image");
-    }
+    } catch { showToast("Failed to add image"); }
     setSaving(false);
   }
 
@@ -190,11 +228,48 @@ export default function AdminPage() {
 
   const unreadCount = messages.filter((m) => !m.read).length;
 
+  // ── Login screen ──
+  if (!authenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center px-6">
+        <form onSubmit={handleLogin} className="w-full max-w-sm space-y-4">
+          <div className="flex flex-col items-center text-center">
+            <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+              <Lock size={24} />
+            </div>
+            <h1 className="mt-4 text-xl font-bold">Admin Access</h1>
+            <p className="mt-1 text-sm text-text-muted">Enter the admin password to continue.</p>
+          </div>
+          <input
+            type="password"
+            placeholder="Password"
+            value={passwordInput}
+            onChange={(e) => { setPasswordInput(e.target.value); setPasswordError(false); }}
+            className="w-full rounded-lg border border-border bg-surface px-4 py-3 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+            autoFocus
+          />
+          {passwordError && <p className="text-center text-sm text-red-500">Wrong password. Try again.</p>}
+          <button type="submit" className="w-full rounded-lg bg-primary px-4 py-3 text-sm font-medium text-white hover:bg-primary-dark">
+            Enter Dashboard
+          </button>
+        </form>
+      </div>
+    );
+  }
+
+  // ── Dashboard ──
   return (
     <div className="min-h-screen px-6 py-12">
       <div className="mx-auto max-w-5xl">
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Admin Dashboard</h1>
-        <p className="mt-1 text-sm text-text-muted">Manage your site content, projects, and messages.</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Admin Dashboard</h1>
+            <p className="mt-1 text-sm text-text-muted">Manage your site content, projects, and messages.</p>
+          </div>
+          <button onClick={() => setAuthenticated(false)} className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm text-text-muted hover:bg-surface-alt">
+            <LogOut size={14} /> Logout
+          </button>
+        </div>
 
         {/* Tabs */}
         <div className="mt-6 flex gap-1 rounded-xl border border-border bg-surface-alt p-1">
@@ -203,17 +278,13 @@ export default function AdminPage() {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium transition-all ${
-                activeTab === tab.id
-                  ? "bg-surface text-text shadow-sm"
-                  : "text-text-muted hover:text-text"
+                activeTab === tab.id ? "bg-surface text-text shadow-sm" : "text-text-muted hover:text-text"
               }`}
             >
               {tab.icon}
               {tab.label}
               {tab.id === "messages" && unreadCount > 0 && (
-                <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
-                  {unreadCount}
-                </span>
+                <span className="ml-1 rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">{unreadCount}</span>
               )}
             </button>
           ))}
@@ -235,9 +306,10 @@ export default function AdminPage() {
                     <input placeholder="Title" required value={projectForm.title} onChange={(e) => setProjectForm({ ...projectForm, title: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                     <textarea placeholder="Description" required rows={2} value={projectForm.description} onChange={(e) => setProjectForm({ ...projectForm, description: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none" />
                     <input placeholder="Tags (comma separated)" value={projectForm.tags} onChange={(e) => setProjectForm({ ...projectForm, tags: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                    <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-3 sm:grid-cols-3">
                       <input placeholder="Live URL" value={projectForm.live_url} onChange={(e) => setProjectForm({ ...projectForm, live_url: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                       <input placeholder="GitHub URL" value={projectForm.github_url} onChange={(e) => setProjectForm({ ...projectForm, github_url: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                      <input placeholder="Image URL" value={projectForm.image_url} onChange={(e) => setProjectForm({ ...projectForm, image_url: e.target.value })} className="rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
                     </div>
                     <label className="flex items-center gap-2 text-sm text-text-muted">
                       <input type="checkbox" checked={projectForm.featured} onChange={(e) => setProjectForm({ ...projectForm, featured: e.target.checked })} className="rounded" />
@@ -259,21 +331,17 @@ export default function AdminPage() {
                           </div>
                           <p className="mt-1 text-sm text-text-muted line-clamp-2">{p.description}</p>
                           <div className="mt-2 flex flex-wrap gap-1">
-                            {p.tags.map((t) => (
-                              <span key={t} className="rounded bg-surface-alt px-2 py-0.5 text-[10px] text-text-muted">{t}</span>
-                            ))}
+                            {p.tags.map((t) => <span key={t} className="rounded bg-surface-alt px-2 py-0.5 text-[10px] text-text-muted">{t}</span>)}
                           </div>
                           <div className="mt-2 flex gap-3">
                             {p.live_url && <a href={p.live_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-primary hover:underline"><ExternalLink size={10} /> Live</a>}
                             {p.github_url && <a href={p.github_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-xs text-text-muted hover:text-primary">Code</a>}
                           </div>
                         </div>
-                        <button onClick={() => deleteProject(p.id)} className="rounded-lg p-2 text-text-muted transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10">
-                          <Trash2 size={14} />
-                        </button>
+                        <button onClick={() => deleteProject(p.id)} className="rounded-lg p-2 text-text-muted hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10"><Trash2 size={14} /></button>
                       </div>
                     ))}
-                    {projects.length === 0 && <p className="text-center text-sm text-text-muted py-10">No projects yet. Add one above.</p>}
+                    {projects.length === 0 && <p className="text-center text-sm text-text-muted py-10">No projects yet.</p>}
                   </div>
                 </div>
               )}
@@ -281,21 +349,28 @@ export default function AdminPage() {
               {/* ── Gallery Tab ── */}
               {activeTab === "gallery" && (
                 <div className="space-y-6">
-                  <form onSubmit={addImage} className="rounded-xl border border-border p-5 space-y-3">
+                  <div className="rounded-xl border border-border p-5 space-y-3">
                     <h3 className="font-semibold">Add Image</h3>
-                    <input placeholder="Title" required value={imageForm.title} onChange={(e) => setImageForm({ ...imageForm, title: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                    <input placeholder="Image URL" required value={imageForm.url} onChange={(e) => setImageForm({ ...imageForm, url: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
-                    <select value={imageForm.category} onChange={(e) => setImageForm({ ...imageForm, category: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary">
-                      <option value="general">General</option>
-                      <option value="projects">Projects</option>
-                      <option value="campus">Campus</option>
-                      <option value="personal">Personal</option>
-                    </select>
-                    <button type="submit" disabled={saving} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-50">
-                      {saving ? <Loader2 size={14} className="animate-spin" /> : null}
-                      Add Image
-                    </button>
-                  </form>
+                    <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border py-8 text-sm text-text-muted transition-colors hover:border-primary/30 hover:text-primary">
+                      <Upload size={18} />
+                      {uploading ? "Uploading..." : "Click to upload an image"}
+                      <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} disabled={uploading} />
+                    </label>
+                    <form onSubmit={addImage} className="space-y-3">
+                      <input placeholder="Image URL (auto-filled after upload)" required value={imageForm.url} onChange={(e) => setImageForm({ ...imageForm, url: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                      <input placeholder="Title" required value={imageForm.title} onChange={(e) => setImageForm({ ...imageForm, title: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+                      <select value={imageForm.category} onChange={(e) => setImageForm({ ...imageForm, category: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary">
+                        <option value="general">General</option>
+                        <option value="projects">Projects</option>
+                        <option value="campus">Campus</option>
+                        <option value="personal">Personal</option>
+                      </select>
+                      <button type="submit" disabled={saving || !imageForm.url} className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-50">
+                        {saving ? <Loader2 size={14} className="animate-spin" /> : null}
+                        Save Image
+                      </button>
+                    </form>
+                  </div>
 
                   <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                     {images.map((img) => (
@@ -310,7 +385,7 @@ export default function AdminPage() {
                         </button>
                       </div>
                     ))}
-                    {images.length === 0 && <p className="col-span-full text-center text-sm text-text-muted py-10">No images yet. Add one above.</p>}
+                    {images.length === 0 && <p className="col-span-full text-center text-sm text-text-muted py-10">No images yet.</p>}
                   </div>
                 </div>
               )}
@@ -330,11 +405,11 @@ export default function AdminPage() {
                         </div>
                         <div className="flex gap-1">
                           {!m.read && (
-                            <button onClick={() => markRead(m.id)} className="rounded-lg p-2 text-text-muted transition-colors hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-500/10" title="Mark as read">
+                            <button onClick={() => markRead(m.id)} className="rounded-lg p-2 text-text-muted hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-500/10" title="Mark read">
                               <Check size={14} />
                             </button>
                           )}
-                          <button onClick={() => deleteMessage(m.id)} className="rounded-lg p-2 text-text-muted transition-colors hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10">
+                          <button onClick={() => deleteMessage(m.id)} className="rounded-lg p-2 text-text-muted hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-500/10">
                             <Trash2 size={14} />
                           </button>
                         </div>
@@ -358,14 +433,8 @@ export default function AdminPage() {
           )}
         </div>
 
-        {/* Toast */}
         {toast && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="fixed bottom-6 right-6 rounded-xl bg-surface border border-border px-4 py-3 text-sm font-medium shadow-lg"
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="fixed bottom-6 right-6 rounded-xl bg-surface border border-border px-4 py-3 text-sm font-medium shadow-lg z-50">
             {toast}
           </motion.div>
         )}
@@ -374,35 +443,15 @@ export default function AdminPage() {
   );
 }
 
-function SettingRow({
-  settingKey,
-  value,
-  onSave,
-  saving,
-}: {
-  settingKey: string;
-  value: string;
-  onSave: (key: string, value: string) => Promise<void>;
-  saving: boolean;
-}) {
+function SettingRow({ settingKey, value, onSave, saving }: { settingKey: string; value: string; onSave: (key: string, value: string) => Promise<void>; saving: boolean }) {
   const [localValue, setLocalValue] = useState(value);
 
   return (
     <div className="rounded-xl border border-border p-4">
       <label className="text-xs font-medium uppercase tracking-wider text-text-muted">{settingKey.replace(/_/g, " ")}</label>
       <div className="mt-2 flex gap-2">
-        <input
-          value={localValue}
-          onChange={(e) => setLocalValue(e.target.value)}
-          className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary"
-        />
-        <button
-          onClick={() => onSave(settingKey, localValue)}
-          disabled={saving || localValue === value}
-          className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-40"
-        >
-          Save
-        </button>
+        <input value={localValue} onChange={(e) => setLocalValue(e.target.value)} className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary focus:ring-1 focus:ring-primary" />
+        <button onClick={() => onSave(settingKey, localValue)} disabled={saving || localValue === value} className="rounded-lg bg-primary px-3 py-2 text-sm font-medium text-white hover:bg-primary-dark disabled:opacity-40">Save</button>
       </div>
     </div>
   );
