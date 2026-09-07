@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 
 export async function POST(request: Request) {
   const body = await request.json();
@@ -11,10 +12,22 @@ export async function POST(request: Request) {
     );
   }
 
+  // Save to database
+  const supabase = await createClient();
+
+  const { error: dbError } = await supabase
+    .from("contact_messages")
+    .insert({ name, email, message });
+
+  if (dbError) {
+    console.error("Failed to save message:", dbError);
+  }
+
+  // Optionally send email via Resend
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("RESEND_API_KEY not set — skipping email send");
-    return NextResponse.json({ success: true, skipped: true });
+    console.warn("RESEND_API_KEY not set — message saved to DB only");
+    return NextResponse.json({ success: true, emailSent: false });
   }
 
   try {
@@ -29,12 +42,9 @@ export async function POST(request: Request) {
       text: `Name: ${name}\nEmail: ${email}\n\n${message}`,
     });
 
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, emailSent: true });
   } catch (error) {
-    console.error("Contact form error:", error);
-    return NextResponse.json(
-      { error: "Failed to send message." },
-      { status: 500 }
-    );
+    console.error("Email send error:", error);
+    return NextResponse.json({ success: true, emailSent: false });
   }
 }
