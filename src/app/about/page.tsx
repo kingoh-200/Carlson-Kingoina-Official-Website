@@ -1,6 +1,5 @@
 "use client";
 
-import { motion } from "framer-motion";
 import Section from "@/components/Section";
 import AnimatedSection from "@/components/AnimatedSection";
 import SparkleEffect from "@/components/SparkleEffect";

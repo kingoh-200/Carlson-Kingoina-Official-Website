@@ -1,5 +1,3 @@
-import { Mail, MapPin } from "lucide-react";
-
 interface SkillCardProps {
   icon: React.ReactNode;
   title: string;

@@ -124,7 +124,7 @@ export default function InteractiveHero() {
         const radius = 1.5 + proximity * 2;
 
         // Rainbow color based on proximity
-        let alpha = 0.15 + proximity * 0.5;
+        const alpha = 0.15 + proximity * 0.5;
         let color: string;
 
         if (proximity > 0.1) {
