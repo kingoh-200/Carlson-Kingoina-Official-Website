@@ -105,7 +105,7 @@ export default function Home() {
                   Show some love — it means a lot.
                 </p>
               </div>
-              <LikeButton />
+              <LikeButton page="home" />
             </div>
           </div>
         </div>

@@ -21,7 +21,7 @@ export default function ProjectsPage() {
       <AnimatedSection delay={0.2}>
         <div className="px-6 pb-12">
           <div className="mx-auto max-w-4xl">
-            <LikeButton />
+            <LikeButton page="projects" />
           </div>
         </div>
       </AnimatedSection>

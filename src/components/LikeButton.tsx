@@ -1,19 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 
-export default function LikeButton() {
+export default function LikeButton({ page }: { page: "home" | "projects" }) {
   const [count, setCount] = useState(0);
   const [isBursting, setIsBursting] = useState(false);
 
-  function handleClick() {
+  useEffect(() => {
+    let cancelled = false;
+
+    fetch(`/api/likes?page=${page}`)
+      .then((response) => response.ok ? response.json() : null)
+      .then((data) => {
+        if (!cancelled && typeof data?.count === "number") setCount(data.count);
+      })
+      .catch(() => undefined);
+
+    return () => { cancelled = true; };
+  }, [page]);
+
+  async function handleClick() {
     setCount((c) => c + 1);
     setIsBursting(true);
     setTimeout(() => setIsBursting(false), 300);
+
+    try {
+      const response = await fetch(`/api/likes?page=${page}`, { method: "POST" });
+      const data = await response.json().catch(() => null);
+      if (!response.ok || typeof data?.count !== "number") throw new Error("Like was not saved.");
+      setCount((current) => Math.max(current, data.count));
+    } catch {
+      // Refresh the total so a temporary failed request does not leave a false count.
+      fetch(`/api/likes?page=${page}`)
+        .then((response) => response.ok ? response.json() : null)
+        .then((data) => { if (typeof data?.count === "number") setCount(data.count); })
+        .catch(() => undefined);
+    }
   }
 
   return (
