@@ -8,6 +8,7 @@ export const siteConfig = {
     github: "https://github.com/kingoh-200",
     linkedin: "https://www.linkedin.com/in/carison-moikoro-56b198303",
     twitter: "https://x.com/carlson15564064",
+    instagram: "https://www.instagram.com/mmh.key.sea/",
   },
 };
 

@@ -1,12 +1,13 @@
 "use client";
 
-import { Github, Linkedin, Twitter } from "lucide-react";
+import { Github, Instagram, Linkedin, Twitter } from "lucide-react";
 import { motion } from "framer-motion";
 
 const socials = [
   { href: "https://github.com/kingoh-200", label: "GitHub", icon: Github },
   { href: "https://www.linkedin.com/in/carison-moikoro-56b198303", label: "LinkedIn", icon: Linkedin },
   { href: "https://x.com/carlson15564064", label: "X (Twitter)", icon: Twitter },
+  { href: "https://www.instagram.com/mmh.key.sea/", label: "Instagram", icon: Instagram },
 ];
 
 export default function Footer() {
