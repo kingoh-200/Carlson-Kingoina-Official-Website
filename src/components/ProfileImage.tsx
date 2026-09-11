@@ -1,20 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getCachedAvatarUrl, loadProfileAvatar, setCachedAvatarUrl } from "@/lib/profile-avatar-client";
 
 export default function ProfileImage() {
-  const [src, setSrc] = useState<string | null>(null);
+  const [src, setSrc] = useState<string | null | undefined>(() => getCachedAvatarUrl());
 
   useEffect(() => {
-    fetch("/api/profile", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : null)
-      .then((data) => {
-        if (data?.profile?.avatar_url) setSrc((current) => current === data.profile.avatar_url ? current : data.profile.avatar_url);
-      })
-      .catch(() => undefined);
+    let active = true;
+    loadProfileAvatar().then((url) => { if (active) setSrc(url); });
+    return () => { active = false; };
   }, []);
 
-  if (!src) {
+  if (src === undefined) {
+    return <div className="h-full w-full animate-pulse bg-surface-alt" aria-label="Loading profile photo" />;
+  }
+
+  if (src === null) {
     return <div className="flex h-full w-full items-center justify-center text-4xl font-bold text-text-muted">CK</div>;
   }
 
@@ -25,7 +27,7 @@ export default function ProfileImage() {
       className="h-full w-full object-cover"
       width={1200}
       height={1200}
-      onError={() => setSrc(null)}
+      onError={() => { setCachedAvatarUrl(null); setSrc(null); }}
     />
   );
 }

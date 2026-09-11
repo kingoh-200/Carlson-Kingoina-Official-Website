@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import ProfileCropper from "@/components/ProfileCropper";
+import { setCachedAvatarUrl } from "@/lib/profile-avatar-client";
 import {
   FolderOpen,
   ImageIcon,
@@ -175,6 +176,7 @@ export default function AdminPage() {
   async function uploadProfileImage(file: File) {
     const url = await uploadFile(file, "profile");
     if (url) {
+      setCachedAvatarUrl(url);
       setProfile((current) => current ? { ...current, avatar_url: url } : current);
       showToast("Profile image uploaded. Save your profile to publish it.");
     }
@@ -241,6 +243,7 @@ export default function AdminPage() {
         return;
       }
       setProfile(data.profile ?? profile);
+      setCachedAvatarUrl(data.profile?.avatar_url ?? profile.avatar_url ?? null);
       showToast("Profile saved!");
     } catch {
       showToast("Could not reach the profile service. Please try again.");

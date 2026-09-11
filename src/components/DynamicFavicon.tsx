@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
+import { loadProfileAvatar } from "@/lib/profile-avatar-client";
 
 export default function DynamicFavicon() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("/api/profile", { cache: "no-store" })
-      .then((response) => response.ok ? response.json() : null)
-      .then((data) => {
-        const avatarUrl = data?.profile?.avatar_url;
+    loadProfileAvatar()
+      .then((avatarUrl) => {
         if (cancelled || !avatarUrl) return;
 
         let icon = document.querySelector<HTMLLinkElement>('link[rel="icon"]');
