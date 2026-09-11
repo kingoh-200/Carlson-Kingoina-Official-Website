@@ -26,7 +26,7 @@ import {
   faArrowRight,
 } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
-import Image from "next/image";
+import ProfileImage from "@/components/ProfileImage";
 
 export default function AboutPage() {
   return (
@@ -38,16 +38,7 @@ export default function AboutPage() {
             {/* Photo */}
             <AnimatedSection>
               <div className="relative h-40 w-40 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-border bg-surface-alt shadow-lg sm:h-48 sm:w-48">
-                <Image
-                  src="/images/profile.jpg"
-                  alt="Carlson Kingoina"
-                  fill
-                  className="object-cover"
-                  priority
-                />
-                <div className="absolute inset-0 flex items-center justify-center text-4xl font-bold text-text-muted">
-                  CK
-                </div>
+                <ProfileImage />
               </div>
             </AnimatedSection>
 

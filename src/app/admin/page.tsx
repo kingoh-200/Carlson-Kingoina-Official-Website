@@ -163,6 +163,14 @@ export default function AdminPage() {
     }
   }
 
+  async function uploadProfileImage(file: File) {
+    const url = await uploadFile(file);
+    if (url) {
+      setProfile((current) => current ? { ...current, avatar_url: url } : current);
+      showToast("Profile image uploaded. Save your profile to publish it.");
+    }
+  }
+
   async function addProject(e: React.FormEvent) {
     e.preventDefault(); setSaving(true);
     await fetch("/api/projects", { method: "POST", headers: { "Content-Type": "application/json" },
@@ -216,8 +224,20 @@ export default function AdminPage() {
 
   async function saveProfile(e: React.FormEvent) {
     e.preventDefault(); if (!profile) return; setSaving(true);
-    await fetch("/api/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(profile) });
-    showToast("Profile saved!"); setSaving(false);
+    try {
+      const res = await fetch("/api/profile", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(profile) });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showToast(data.error || "Could not save your profile.");
+        return;
+      }
+      setProfile(data.profile ?? profile);
+      showToast("Profile saved!");
+    } catch {
+      showToast("Could not reach the profile service. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function saveSetting(key: string, value: string) {
@@ -249,9 +269,9 @@ export default function AdminPage() {
 
   // ── Dashboard ──
   return (
-    <div className="min-h-screen px-6 py-12">
-      <div className="mx-auto max-w-6xl">
-        <div className="flex items-center justify-between">
+    <div className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-10 lg:px-10">
+      <div className="w-full max-w-none">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Admin Dashboard</h1>
             <p className="mt-1 text-sm text-text-muted">Manage your entire site from here.</p>
@@ -260,10 +280,10 @@ export default function AdminPage() {
         </div>
 
         {/* Tabs */}
-        <div className="mt-6 flex flex-wrap gap-1 rounded-xl border border-border bg-surface-alt p-1">
+        <div className="mt-6 flex gap-1 overflow-x-auto rounded-xl border border-border bg-surface-alt p-1">
           {tabs.map((tab) => (
-            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all ${activeTab === tab.id ? "bg-surface text-text shadow-sm" : "text-text-muted hover:text-text"}`}>
-              {tab.icon}<span className="hidden sm:inline">{tab.label}</span>
+            <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium transition-all ${activeTab === tab.id ? "bg-surface text-text shadow-sm" : "text-text-muted hover:text-text"}`}>
+              {tab.icon}<span>{tab.label}</span>
               {tab.id === "messages" && unreadCount > 0 && <span className="rounded-full bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">{unreadCount}</span>}
             </button>
           ))}
@@ -277,7 +297,7 @@ export default function AdminPage() {
               {/* ── Dashboard Overview ── */}
               {activeTab === "dashboard" && (
                 <div className="space-y-6">
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                  <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                     <StatCard icon={<FolderOpen size={20} />} label="Projects" value={projects.length} sub={`${featuredCount} featured`} />
                     <StatCard icon={<ImageIcon size={20} />} label="Gallery" value={images.length} sub="images uploaded" />
                     <StatCard icon={<MessageSquare size={20} />} label="Messages" value={messages.length} sub={`${unreadCount} unread`} accent={unreadCount > 0} />
@@ -432,6 +452,19 @@ export default function AdminPage() {
               {activeTab === "profile" && profile && (
                 <form onSubmit={saveProfile} className="rounded-xl border border-border p-5 space-y-4">
                   <h3 className="font-semibold">Edit Profile</h3>
+                  <div className="flex flex-col gap-4 rounded-xl border border-dashed border-border bg-surface-alt p-4 sm:flex-row sm:items-center">
+                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-border bg-surface">
+                      {profile.avatar_url ? <img src={profile.avatar_url} alt="Profile preview" className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-lg font-bold text-text-muted">{profile.full_name.slice(0, 2).toUpperCase()}</div>}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">Profile photo</p>
+                      <p className="mt-1 text-xs text-text-muted">JPEG, PNG, WebP, or GIF. Maximum 4 MB.</p>
+                      <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium hover:border-primary/40 hover:text-primary">
+                        <Upload size={15} />{uploading ? "Uploading..." : "Upload photo"}
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploading} onChange={async (e) => { const file = e.target.files?.[0]; if (file) await uploadProfileImage(file); e.currentTarget.value = ""; }} />
+                      </label>
+                    </div>
+                  </div>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div><label className="text-xs text-text-muted">Full Name</label><input value={profile.full_name} onChange={(e) => setProfile({ ...profile, full_name: e.target.value })} className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary" /></div>
                     <div><label className="text-xs text-text-muted">Role</label><input value={profile.role || ""} onChange={(e) => setProfile({ ...profile, role: e.target.value })} className="mt-1 w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary" /></div>

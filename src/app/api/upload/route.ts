@@ -7,7 +7,7 @@ export const runtime = "nodejs";
 // this handler runs. Leave room for multipart form-data overhead.
 const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
 const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
-const ALLOWED_FOLDERS = new Set(["images", "portfolio"]);
+const ALLOWED_FOLDERS = new Set(["images", "portfolio", "profile"]);
 
 // Configure Cloudinary
 cloudinary.config({
