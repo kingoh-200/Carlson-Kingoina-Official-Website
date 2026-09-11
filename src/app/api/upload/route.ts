@@ -63,10 +63,12 @@ export async function POST(request: Request) {
         {
           folder,
           resource_type: "image",
-          transformation: [
-            { width: 1200, height: 1200, crop: "limit" },
-            { quality: "auto", fetch_format: "auto" },
-          ],
+          transformation: folder === "profile"
+            ? [{ width: 1200, height: 1200, crop: "fill", gravity: "auto", quality: "auto:best", fetch_format: "auto" }]
+            : [
+                { width: 1200, height: 1200, crop: "limit" },
+                { quality: "auto", fetch_format: "auto" },
+              ],
         },
         (error, result) => {
           if (error) reject(error);

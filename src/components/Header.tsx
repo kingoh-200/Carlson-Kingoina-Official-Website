@@ -31,7 +31,7 @@ export default function Header() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-surface/80 backdrop-blur-md">
-      <nav className="mx-auto flex max-w-4xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-10">
         {/* Logo */}
         <Link
           href="/"
@@ -113,7 +113,7 @@ export default function Header() {
           mobileOpen ? "max-h-80 border-t border-border" : "max-h-0"
         )}
       >
-        <ul className="px-6 py-4">
+        <ul className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6 lg:px-10">
           {navLinks.map((link) => (
             <li key={link.href}>
               <Link

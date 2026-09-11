@@ -16,8 +16,8 @@ export default function Section({
   id,
 }: SectionProps) {
   return (
-    <section id={id} className={clsx("px-6 py-16", className)}>
-      <div className="mx-auto max-w-4xl">
+    <section id={id} className={clsx("px-4 py-14 sm:px-6 sm:py-16 lg:px-10", className)}>
+      <div className="mx-auto w-full max-w-6xl">
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
           {title}
         </h2>

@@ -7,13 +7,14 @@ import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { faHeart as faHeartSolid } from "@fortawesome/free-solid-svg-icons";
 
 export default function LikeButton({ page }: { page: "home" | "projects" }) {
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState<number | null>(null);
   const [isBursting, setIsBursting] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
 
-    fetch(`/api/likes?page=${page}`)
+    fetch(`/api/likes?page=${page}`, { cache: "no-store" })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         if (!cancelled && typeof data?.count === "number") setCount(data.count);
@@ -24,7 +25,9 @@ export default function LikeButton({ page }: { page: "home" | "projects" }) {
   }, [page]);
 
   async function handleClick() {
-    setCount((c) => c + 1);
+    if (saving) return;
+    setSaving(true);
+    setCount((c) => (c ?? 0) + 1);
     setIsBursting(true);
     setTimeout(() => setIsBursting(false), 300);
 
@@ -32,13 +35,15 @@ export default function LikeButton({ page }: { page: "home" | "projects" }) {
       const response = await fetch(`/api/likes?page=${page}`, { method: "POST" });
       const data = await response.json().catch(() => null);
       if (!response.ok || typeof data?.count !== "number") throw new Error("Like was not saved.");
-      setCount((current) => Math.max(current, data.count));
+      setCount((current) => Math.max(current ?? 0, data.count));
     } catch {
       // Refresh the total so a temporary failed request does not leave a false count.
-      fetch(`/api/likes?page=${page}`)
+      fetch(`/api/likes?page=${page}`, { cache: "no-store" })
         .then((response) => response.ok ? response.json() : null)
         .then((data) => { if (typeof data?.count === "number") setCount(data.count); })
         .catch(() => undefined);
+    } finally {
+      setSaving(false);
     }
   }
 
@@ -46,7 +51,8 @@ export default function LikeButton({ page }: { page: "home" | "projects" }) {
     <button
       onClick={handleClick}
       className="group inline-flex items-center gap-2 rounded-full border border-border px-4 py-2 text-sm font-medium transition-all hover:border-primary/40 hover:bg-primary/5"
-      aria-label={`Like this page, ${count} likes`}
+      disabled={saving || count === null}
+      aria-label={`Like this page, ${count ?? 0} likes`}
     >
       <AnimatePresence mode="wait">
         <motion.span
@@ -57,7 +63,7 @@ export default function LikeButton({ page }: { page: "home" | "projects" }) {
           transition={{ type: "spring", stiffness: 500, damping: 15 }}
           className="inline-block"
         >
-          {count > 0 ? (
+          {(count ?? 0) > 0 ? (
             <FontAwesomeIcon
               icon={faHeartSolid}
               className="h-4 w-4 text-rose-500"
@@ -71,7 +77,7 @@ export default function LikeButton({ page }: { page: "home" | "projects" }) {
         </motion.span>
       </AnimatePresence>
       <span className="text-text-muted transition-colors group-hover:text-primary">
-        {count > 0 ? `${count} ${count === 1 ? "like" : "likes"}` : "Like this page"}
+        {count === null ? "Loading likes..." : count > 0 ? `${count} ${count === 1 ? "like" : "likes"}` : "Like this page"}
       </span>
     </button>
   );

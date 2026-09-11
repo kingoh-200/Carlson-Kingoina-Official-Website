@@ -1,16 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useState } from "react";
 
 export default function ProfileImage() {
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/profile")
+    fetch("/api/profile", { cache: "force-cache" })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
-        if (data?.profile?.avatar_url) setSrc(data.profile.avatar_url);
+        if (data?.profile?.avatar_url) setSrc((current) => current === data.profile.avatar_url ? current : data.profile.avatar_url);
       })
       .catch(() => undefined);
   }, []);
@@ -20,12 +19,12 @@ export default function ProfileImage() {
   }
 
   return (
-    <Image
+    <img
       src={src}
       alt="Carlson Kingoina"
-      fill
-      className="object-cover"
-      priority
+      className="h-full w-full object-cover"
+      width={1200}
+      height={1200}
       onError={() => setSrc(null)}
     />
   );

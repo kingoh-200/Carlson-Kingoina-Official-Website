@@ -12,7 +12,7 @@ const socials = [
 export default function Footer() {
   return (
     <footer className="border-t border-border bg-surface-alt">
-      <div className="mx-auto flex max-w-4xl flex-col items-center gap-4 px-6 py-8 sm:flex-row sm:justify-between">
+      <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-4 px-4 py-8 sm:flex-row sm:px-6 sm:justify-between lg:px-10">
         <p className="text-sm text-text-muted">
           © {new Date().getFullYear()} Carlson Kingoina. All rights reserved.
         </p>

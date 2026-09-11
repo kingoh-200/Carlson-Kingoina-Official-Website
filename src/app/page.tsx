@@ -72,8 +72,8 @@ export default function Home() {
 
       {/* ── Gallery teaser ── */}
       <AnimatedSection delay={0.12}>
-        <div className="px-6 py-12">
-          <div className="mx-auto max-w-4xl">
+        <div className="px-4 py-12 sm:px-6 lg:px-10">
+          <div className="mx-auto w-full max-w-6xl">
             <Link
               href="/gallery"
               className="group flex items-center gap-4 rounded-2xl border border-border p-6 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
@@ -95,10 +95,10 @@ export default function Home() {
 
       {/* ── Subscribe + Like ── */}
       <AnimatedSection delay={0.15}>
-        <div className="px-6 py-12">
-          <div className="mx-auto grid max-w-4xl gap-8 sm:grid-cols-2">
+        <div className="border-y border-border bg-surface-alt px-4 py-14 sm:px-6 lg:px-10">
+          <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:gap-16">
             <SubscribeForm />
-            <div className="flex flex-col items-start justify-center gap-6">
+            <div className="flex min-h-56 flex-col items-start justify-center gap-6 rounded-2xl border border-border bg-surface p-8 shadow-sm">
               <div>
                 <h3 className="font-semibold">Enjoying the site?</h3>
                 <p className="mt-1 text-sm text-text-muted">

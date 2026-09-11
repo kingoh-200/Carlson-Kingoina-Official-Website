@@ -19,8 +19,8 @@ export default function ProjectsPage() {
         </div>
       </Section>
       <AnimatedSection delay={0.2}>
-        <div className="px-6 pb-12">
-          <div className="mx-auto max-w-4xl">
+        <div className="px-4 pb-12 sm:px-6 lg:px-10">
+          <div className="mx-auto w-full max-w-6xl">
             <LikeButton page="projects" />
           </div>
         </div>

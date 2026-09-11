@@ -10,13 +10,13 @@ export default function SubscribeForm() {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState(21);
 
   useEffect(() => {
     fetch("/api/subscribers")
-      .then((r) => r.json())
-      .then((d) => setCount(d.count ?? 0))
-      .catch(() => {});
+      .then((r) => r.ok ? r.json() : null)
+      .then((d) => setCount(typeof d?.count === "number" ? d.count : 21))
+      .catch(() => setCount(21));
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -30,9 +30,10 @@ export default function SubscribeForm() {
         headers: { "Content-Type": "application/json" },
       });
 
+      const data = await res.json().catch(() => null);
       if (!res.ok) throw new Error("Failed");
       setStatus("success");
-      setCount((c) => c + 1);
+      if (typeof data?.count === "number") setCount(data.count);
       setEmail("");
       setName("");
     } catch {
