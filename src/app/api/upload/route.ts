@@ -1,6 +1,14 @@
 import { NextResponse } from "next/server";
 import { v2 as cloudinary } from "cloudinary";
 
+export const runtime = "nodejs";
+
+// Vercel Serverless Functions reject request bodies over about 4.5 MB before
+// this handler runs. Leave room for multipart form-data overhead.
+const MAX_UPLOAD_SIZE = 4 * 1024 * 1024;
+const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const ALLOWED_FOLDERS = new Set(["images", "portfolio"]);
+
 // Configure Cloudinary
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -13,25 +21,24 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     // Accept both "folder" and "bucket" params from the client
-    const folder = (formData.get("folder") as string) || (formData.get("bucket") as string) || "portfolio";
+    const requestedFolder = (formData.get("folder") as string) || (formData.get("bucket") as string) || "portfolio";
+    const folder = ALLOWED_FOLDERS.has(requestedFolder) ? requestedFolder : "portfolio";
 
     if (!file) {
       return NextResponse.json({ error: "No file provided." }, { status: 400 });
     }
 
     // Validate file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
-    if (!allowedTypes.includes(file.type)) {
+    if (!ALLOWED_TYPES.has(file.type)) {
       return NextResponse.json(
         { error: "Only JPEG, PNG, WebP, and GIF images are allowed." },
         { status: 400 }
       );
     }
 
-    // Max 10MB
-    if (file.size > 10 * 1024 * 1024) {
+    if (file.size > MAX_UPLOAD_SIZE) {
       return NextResponse.json(
-        { error: "File must be under 10MB." },
+        { error: "File must be 4 MB or smaller for uploads on Vercel." },
         { status: 400 }
       );
     }

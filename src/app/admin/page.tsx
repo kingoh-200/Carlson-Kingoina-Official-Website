@@ -138,16 +138,29 @@ export default function AdminPage() {
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(null), 3000); }
 
   async function uploadFile(file: File): Promise<string | null> {
+    const maxUploadSize = 4 * 1024 * 1024;
+    if (file.size > maxUploadSize) {
+      showToast("Choose an image smaller than 4 MB.");
+      return null;
+    }
+
     setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("bucket", "images");
-    const res = await fetch("/api/upload", { method: "POST", body: formData });
-    const data = await res.json();
-    setUploading(false);
-    if (data.url) return data.url;
-    showToast(data.error || "Upload failed");
-    return null;
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("bucket", "images");
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      const data = await res.json().catch(() => ({}));
+
+      if (res.ok && data.url) return data.url;
+      showToast(data.error || "Upload failed. Please try again.");
+      return null;
+    } catch {
+      showToast("Could not reach the upload service. Please try again.");
+      return null;
+    } finally {
+      setUploading(false);
+    }
   }
 
   async function addProject(e: React.FormEvent) {
@@ -332,7 +345,7 @@ export default function AdminPage() {
                     <h3 className="font-semibold">Upload Image</h3>
                     <label className="flex cursor-pointer items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border py-8 text-sm text-text-muted transition-colors hover:border-primary/30 hover:text-primary">
                       <Upload size={18} />{uploading ? "Uploading..." : "Click to upload an image"}
-                      <input type="file" accept="image/*" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; if (!file) return; const url = await uploadFile(file); if (url) { setImageForm((f) => ({ ...f, url })); showToast("Uploaded!"); } }} disabled={uploading} />
+                      <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; if (!file) return; const url = await uploadFile(file); if (url) { setImageForm((f) => ({ ...f, url })); showToast("Uploaded!"); } }} disabled={uploading} />
                     </label>
                     <form onSubmit={addImage} className="space-y-3">
                       <input placeholder="Image URL" required value={imageForm.url} onChange={(e) => setImageForm({ ...imageForm, url: e.target.value })} className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-primary" />
