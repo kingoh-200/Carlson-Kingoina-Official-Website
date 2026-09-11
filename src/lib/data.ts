@@ -7,7 +7,7 @@ export const siteConfig = {
   socials: {
     github: "https://github.com/kingoh-200",
     linkedin: "https://www.linkedin.com/in/carison-moikoro-56b198303",
-    twitter: "https://twitter.com/carlsonkingoina",
+    twitter: "https://x.com/carlson15564064",
   },
 };
 

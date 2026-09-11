@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 const socials = [
   { href: "https://github.com/kingoh-200", label: "GitHub", icon: Github },
   { href: "https://www.linkedin.com/in/carison-moikoro-56b198303", label: "LinkedIn", icon: Linkedin },
-  { href: "https://twitter.com/carlsonkingoina", label: "Twitter", icon: Twitter },
+  { href: "https://x.com/carlson15564064", label: "X (Twitter)", icon: Twitter },
 ];
 
 export default function Footer() {

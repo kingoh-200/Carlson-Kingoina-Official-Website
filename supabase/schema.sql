@@ -25,7 +25,7 @@ CREATE POLICY "Authenticated can update profile" ON profiles FOR UPDATE USING (a
 INSERT INTO profiles (full_name, email, location, role, social_github, social_linkedin, social_twitter)
 VALUES (
   'Carlson Kingoina', 'kingoina254@gmail.com', 'Kenya', 'Developer & Creator',
-  'https://github.com/kingoh-200', 'https://www.linkedin.com/in/carison-moikoro-56b198303', 'https://twitter.com/carlsonkingoina'
+  'https://github.com/kingoh-200', 'https://www.linkedin.com/in/carison-moikoro-56b198303', 'https://x.com/carlson15564064'
 ) ON CONFLICT DO NOTHING;
 
 -- ── Projects ──
