@@ -1,6 +1,6 @@
 "use client";
 
-import { Github, Instagram, Linkedin, Twitter } from "lucide-react";
+import { Github, Instagram, Linkedin, MessageCircle, Twitter } from "lucide-react";
 import { motion } from "framer-motion";
 
 const socials = [
@@ -8,6 +8,7 @@ const socials = [
   { href: "https://www.linkedin.com/in/carison-moikoro-56b198303", label: "LinkedIn", icon: Linkedin },
   { href: "https://x.com/carlson15564064", label: "X (Twitter)", icon: Twitter },
   { href: "https://www.instagram.com/mmh.key.sea/", label: "Instagram", icon: Instagram },
+  { href: "https://wa.me/254706504939", label: "WhatsApp", icon: MessageCircle },
 ];
 
 export default function Footer() {

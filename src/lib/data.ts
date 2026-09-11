@@ -9,6 +9,7 @@ export const siteConfig = {
     linkedin: "https://www.linkedin.com/in/carison-moikoro-56b198303",
     twitter: "https://x.com/carlson15564064",
     instagram: "https://www.instagram.com/mmh.key.sea/",
+    whatsapp: "https://wa.me/254706504939",
   },
 };
 
