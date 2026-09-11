@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ImageIcon, Loader2 } from "lucide-react";
-import Image from "next/image";
 
 interface GalleryImage {
   id: string;
@@ -86,12 +85,11 @@ export default function ImageGallery() {
               className="group cursor-pointer overflow-hidden rounded-xl border border-border transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
             >
               <div className="relative aspect-[4/3] overflow-hidden bg-surface-alt">
-                <Image
+                <img
                   src={img.url}
                   alt={img.alt}
-                  fill
-                  className="object-cover transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                  loading="lazy"
                 />
               </div>
               <div className="p-4">
@@ -124,7 +122,7 @@ export default function ImageGallery() {
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
-              className="relative max-h-[85vh] max-w-4xl overflow-hidden rounded-2xl bg-surface"
+              className="relative flex max-h-[90vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl bg-surface"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -133,12 +131,11 @@ export default function ImageGallery() {
               >
                 <X size={18} />
               </button>
-              <div className="relative aspect-video">
-                <Image
+              <div className="flex min-h-0 flex-1 items-center justify-center bg-black/5 p-3">
+                <img
                   src={lightbox.url}
                   alt={lightbox.alt}
-                  fill
-                  className="object-contain"
+                  className="max-h-[72vh] w-auto max-w-full object-contain"
                 />
               </div>
               <div className="p-5">

@@ -137,22 +137,29 @@ export default function AdminPage() {
 
   function showToast(msg: string) { setToast(msg); setTimeout(() => setToast(null), 3000); }
 
-  async function uploadFile(file: File): Promise<string | null> {
-    const maxUploadSize = 4 * 1024 * 1024;
+  async function uploadFile(file: File, folder = "images"): Promise<string | null> {
+    const maxUploadSize = 100 * 1024 * 1024;
     if (file.size > maxUploadSize) {
-      showToast("Choose an image smaller than 4 MB.");
+      showToast("Choose an image smaller than 100 MB.");
       return null;
     }
 
     setUploading(true);
     try {
+      const signatureResponse = await fetch(`/api/upload-signature?folder=${encodeURIComponent(folder)}`, { cache: "no-store" });
+      const signatureData = await signatureResponse.json().catch(() => ({}));
+      if (!signatureResponse.ok) throw new Error(signatureData.error || "Could not prepare the upload.");
+
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("bucket", "images");
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      formData.append("api_key", signatureData.apiKey);
+      formData.append("timestamp", String(signatureData.timestamp));
+      formData.append("signature", signatureData.signature);
+      formData.append("folder", signatureData.folder);
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${signatureData.cloudName}/image/upload`, { method: "POST", body: formData });
       const data = await res.json().catch(() => ({}));
 
-      if (res.ok && data.url) return data.url;
+      if (res.ok && data.secure_url) return data.secure_url;
       showToast(data.error || "Upload failed. Please try again.");
       return null;
     } catch {
@@ -164,7 +171,7 @@ export default function AdminPage() {
   }
 
   async function uploadProfileImage(file: File) {
-    const url = await uploadFile(file);
+    const url = await uploadFile(file, "profile");
     if (url) {
       setProfile((current) => current ? { ...current, avatar_url: url } : current);
       showToast("Profile image uploaded. Save your profile to publish it.");
@@ -458,7 +465,7 @@ export default function AdminPage() {
                     </div>
                     <div>
                       <p className="text-sm font-medium">Profile photo</p>
-                      <p className="mt-1 text-xs text-text-muted">JPEG, PNG, WebP, or GIF. Maximum 4 MB.</p>
+                      <p className="mt-1 text-xs text-text-muted">JPEG, PNG, WebP, or GIF. Maximum 100 MB.</p>
                       <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium hover:border-primary/40 hover:text-primary">
                         <Upload size={15} />{uploading ? "Uploading..." : "Upload photo"}
                         <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploading} onChange={async (e) => { const file = e.target.files?.[0]; if (file) await uploadProfileImage(file); e.currentTarget.value = ""; }} />
