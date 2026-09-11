@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import ProfileImage from "@/components/ProfileImage";
 
 const GRID_SIZE = 24;
 const REACT_RADIUS = 120;
@@ -184,7 +185,9 @@ export default function InteractiveHero() {
       />
 
       <div className="relative mx-auto flex min-h-[calc(100svh-12rem)] w-full max-w-6xl flex-col justify-center">
-        <motion.p
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+          <div className="max-w-2xl">
+            <motion.p
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
@@ -228,6 +231,16 @@ export default function InteractiveHero() {
             Get in Touch
           </Link>
         </motion.div>
+          </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9, y: 16 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="order-first mx-auto h-44 w-44 shrink-0 overflow-hidden rounded-full border-4 border-surface bg-surface-alt shadow-2xl shadow-primary/25 ring-2 ring-primary/30 sm:h-52 sm:w-52 lg:order-last lg:mx-0 lg:h-64 lg:w-64"
+          >
+            <ProfileImage />
+          </motion.div>
+        </div>
       </div>
     </section>
   );
