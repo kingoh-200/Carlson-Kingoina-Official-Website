@@ -6,7 +6,7 @@ export const siteConfig = {
   bio: "Hey! I'm Carlson — a developer who builds things for the web. I love turning ideas into real products that people actually use. When I'm not coding, I'm thinking about how tech can make communities better.",
   socials: {
     github: "https://github.com/kingoh-200",
-    linkedin: "https://linkedin.com/in/carlsonkingoina",
+    linkedin: "https://www.linkedin.com/in/carison-moikoro-56b198303",
     twitter: "https://twitter.com/carlsonkingoina",
   },
 };
