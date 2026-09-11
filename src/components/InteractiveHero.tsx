@@ -177,15 +177,15 @@ export default function InteractiveHero() {
   }, [theme, initDots]);
 
   return (
-    <section className="relative min-h-[min(42rem,calc(100svh-4.5rem))] overflow-hidden px-4 py-24 sm:px-6 sm:py-32 lg:px-10">
+    <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
       {/* Canvas background */}
       <canvas
         ref={canvasRef}
         className="pointer-events-auto absolute inset-0 h-full w-full"
       />
 
-      <div className="relative mx-auto flex min-h-[calc(100svh-12rem)] w-full max-w-6xl flex-col justify-center">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+      <div className="relative mx-auto w-full max-w-6xl">
+        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
           <div className="max-w-2xl">
             <motion.p
           initial={{ opacity: 0, y: 12 }}
