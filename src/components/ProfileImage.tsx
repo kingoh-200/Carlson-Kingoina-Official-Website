@@ -6,7 +6,7 @@ export default function ProfileImage() {
   const [src, setSrc] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/profile", { cache: "force-cache" })
+    fetch("/api/profile", { cache: "no-store" })
       .then((response) => response.ok ? response.json() : null)
       .then((data) => {
         if (data?.profile?.avatar_url) setSrc((current) => current === data.profile.avatar_url ? current : data.profile.avatar_url);

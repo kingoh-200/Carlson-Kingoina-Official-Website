@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import ProfileCropper from "@/components/ProfileCropper";
 import {
   FolderOpen,
   ImageIcon,
@@ -71,6 +72,7 @@ export default function AdminPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [profileImageToCrop, setProfileImageToCrop] = useState<File | null>(null);
 
   const [projects, setProjects] = useState<Project[]>([]);
   const [images, setImages] = useState<GalleryImage[]>([]);
@@ -460,15 +462,15 @@ export default function AdminPage() {
                 <form onSubmit={saveProfile} className="rounded-xl border border-border p-5 space-y-4">
                   <h3 className="font-semibold">Edit Profile</h3>
                   <div className="flex flex-col gap-4 rounded-xl border border-dashed border-border bg-surface-alt p-4 sm:flex-row sm:items-center">
-                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-border bg-surface">
+                    <div className="h-24 w-24 shrink-0 overflow-hidden rounded-full border-4 border-surface bg-surface shadow-md ring-1 ring-primary/20">
                       {profile.avatar_url ? <img src={profile.avatar_url} alt="Profile preview" className="h-full w-full object-cover" /> : <div className="flex h-full w-full items-center justify-center text-lg font-bold text-text-muted">{profile.full_name.slice(0, 2).toUpperCase()}</div>}
                     </div>
                     <div>
                       <p className="text-sm font-medium">Profile photo</p>
                       <p className="mt-1 text-xs text-text-muted">JPEG, PNG, WebP, or GIF. Maximum 100 MB.</p>
                       <label className="mt-3 inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2 text-sm font-medium hover:border-primary/40 hover:text-primary">
-                        <Upload size={15} />{uploading ? "Uploading..." : "Upload photo"}
-                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploading} onChange={async (e) => { const file = e.target.files?.[0]; if (file) await uploadProfileImage(file); e.currentTarget.value = ""; }} />
+                        <Upload size={15} />{uploading ? "Uploading..." : "Choose & crop photo"}
+                        <input type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" disabled={uploading} onChange={(e) => { const file = e.target.files?.[0]; if (file) setProfileImageToCrop(file); e.currentTarget.value = ""; }} />
                       </label>
                     </div>
                   </div>
@@ -504,6 +506,7 @@ export default function AdminPage() {
         {toast && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="fixed bottom-6 right-6 rounded-xl bg-surface border border-border px-4 py-3 text-sm font-medium shadow-lg z-50">{toast}</motion.div>
         )}
+        {profileImageToCrop && <ProfileCropper file={profileImageToCrop} onCancel={() => setProfileImageToCrop(null)} onCrop={async (file) => { await uploadProfileImage(file); setProfileImageToCrop(null); }} />}
       </div>
     </div>
   );

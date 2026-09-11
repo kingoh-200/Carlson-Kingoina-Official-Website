@@ -37,7 +37,7 @@ export default function AboutPage() {
           <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
             {/* Photo */}
             <AnimatedSection>
-              <div className="relative h-40 w-40 flex-shrink-0 overflow-hidden rounded-2xl border-2 border-border bg-surface-alt shadow-lg sm:h-48 sm:w-48">
+              <div className="relative h-40 w-40 flex-shrink-0 overflow-hidden rounded-full border-4 border-surface bg-surface-alt shadow-xl shadow-primary/20 ring-2 ring-primary/25 sm:h-48 sm:w-48">
                 <ProfileImage />
               </div>
             </AnimatedSection>
