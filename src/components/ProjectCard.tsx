@@ -29,7 +29,7 @@ export default function ProjectCard({ project }: { project: Project }) {
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      className="glow-card group rounded-xl border border-border p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5"
+      className="glow-card group rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5"
     >
       <h3 className="text-lg font-semibold">{project.title}</h3>
       <p className="mt-2 text-sm leading-relaxed text-text-muted">
