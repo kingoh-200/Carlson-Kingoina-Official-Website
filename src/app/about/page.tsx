@@ -32,7 +32,7 @@ export default function AboutPage() {
   return (
     <>
       {/* ── Hero: Photo + Greeting ── */}
-      <section className="px-6 pt-28 pb-8">
+      <section className="px-6 pt-12 pb-8 sm:pt-28">
         <div className="mx-auto max-w-4xl">
           <div className="flex flex-col items-start gap-8 sm:flex-row sm:items-center">
             {/* Photo */}

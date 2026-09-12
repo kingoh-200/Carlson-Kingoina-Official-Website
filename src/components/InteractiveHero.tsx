@@ -29,11 +29,12 @@ export default function InteractiveHero() {
   const { theme } = useTheme();
 
   const initDots = useCallback(
-    (canvas: HTMLCanvasElement) => {
-      const cols = Math.ceil(canvas.width / GRID_SIZE);
-      const rows = Math.ceil(canvas.height / GRID_SIZE);
-      const offsetX = (canvas.width - cols * GRID_SIZE) / 2;
-      const offsetY = (canvas.height - rows * GRID_SIZE) / 2;
+    (width: number, height: number) => {
+      // Grid lives in CSS-pixel space (the drawing context is DPR-scaled).
+      const cols = Math.ceil(width / GRID_SIZE);
+      const rows = Math.ceil(height / GRID_SIZE);
+      const offsetX = (width - cols * GRID_SIZE) / 2;
+      const offsetY = (height - rows * GRID_SIZE) / 2;
 
       dotsRef.current = [];
       for (let r = 0; r < rows; r++) {
@@ -54,6 +55,12 @@ export default function InteractiveHero() {
     []
   );
 
+  // Keep a ref to the theme so the animation loop reads it without restarting
+  const themeRef = useRef(theme);
+  useEffect(() => {
+    themeRef.current = theme;
+  }, [theme]);
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -67,8 +74,9 @@ export default function InteractiveHero() {
       canvas.height = rect.height * dpr;
       canvas.style.width = `${rect.width}px`;
       canvas.style.height = `${rect.height}px`;
-      ctx.scale(dpr, dpr);
-      initDots(canvas);
+      // setTransform (not scale) so repeated resizes don't compound the DPR scale
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      initDots(rect.width, rect.height);
     };
 
     resize();
@@ -94,7 +102,7 @@ export default function InteractiveHero() {
       const h = canvas.height / (window.devicePixelRatio || 1);
       ctx.clearRect(0, 0, w, h);
 
-      const isDark = theme === "dark";
+      const isDark = themeRef.current === "dark";
       const mx = mouseRef.current.x;
       const my = mouseRef.current.y;
 
@@ -174,7 +182,7 @@ export default function InteractiveHero() {
       canvas.removeEventListener("mousemove", handleMouse);
       canvas.removeEventListener("mouseleave", handleMouseLeave);
     };
-  }, [theme, initDots]);
+  }, [initDots]);
 
   return (
     <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
@@ -216,17 +224,17 @@ export default function InteractiveHero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="mt-8 flex gap-4"
+          className="mt-8 flex flex-col gap-3 min-[400px]:flex-row min-[400px]:gap-4"
         >
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white transition-all hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white transition-all hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/25 active:scale-[0.98]"
           >
             View Projects <ArrowRight size={16} />
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center rounded-lg border border-border px-5 py-3 text-sm font-medium transition-all hover:bg-surface-alt hover:border-primary/30 active:scale-[0.98]"
+            className="inline-flex items-center justify-center gap-2 rounded-lg border border-border px-5 py-3 text-sm font-medium transition-all hover:bg-surface-alt hover:border-primary/30 active:scale-[0.98]"
           >
             Get in Touch
           </Link>

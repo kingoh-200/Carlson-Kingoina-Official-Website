@@ -10,7 +10,7 @@ export default function GalleryPage() {
       <Section
         title="Gallery"
         description="Moments, projects, and things I've been working on."
-        className="pt-24"
+        className="pt-8 sm:pt-24"
       >
         <AnimatedSection>
           <ImageGallery />

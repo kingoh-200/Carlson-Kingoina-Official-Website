@@ -15,16 +15,16 @@ export default function Hero() {
           A developer and creator building things for the web. I love working
           with modern tools, open source, and turning ideas into products.
         </p>
-        <div className="mt-8 flex gap-4">
+        <div className="mt-8 flex flex-col gap-3 min-[400px]:flex-row min-[400px]:gap-4">
           <Link
             href="/projects"
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+            className="inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
           >
             View Projects <ArrowRight size={16} />
           </Link>
           <Link
             href="/contact"
-            className="inline-flex items-center rounded-lg border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-surface-alt"
+            className="inline-flex items-center justify-center rounded-lg border border-border px-5 py-3 text-sm font-medium transition-colors hover:bg-surface-alt"
           >
             Get in Touch
           </Link>

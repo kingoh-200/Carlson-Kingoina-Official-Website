@@ -8,7 +8,7 @@ import { siteConfig } from "@/lib/data";
 
 export default function ContactPage() {
   return (
-    <Section title="Get in Touch" className="pt-24">
+    <Section title="Get in Touch" className="pt-8 sm:pt-24">
       <div className="grid gap-12 lg:grid-cols-5">
         <AnimatedSection className="lg:col-span-3">
           <ContactForm />

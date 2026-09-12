@@ -28,13 +28,34 @@ export default function ImageGallery() {
         ? "/api/gallery"
         : `/api/gallery?category=${activeCategory}`;
 
+    let cancelled = false;
     setLoading(true);
     fetch(url)
       .then((r) => r.json())
-      .then((d) => setImages(d.images ?? []))
-      .catch(() => setImages([]))
-      .finally(() => setLoading(false));
+      .then((d) => {
+        if (!cancelled) setImages(d.images ?? []);
+      })
+      .catch(() => {
+        if (!cancelled) setImages([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [activeCategory]);
+
+  // Close the lightbox with Escape
+  useEffect(() => {
+    if (!lightbox) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setLightbox(null);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [lightbox]);
 
   return (
     <div>
@@ -44,7 +65,7 @@ export default function ImageGallery() {
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+            className={`min-h-11 rounded-full px-4 py-2 text-sm font-medium transition-all ${
               activeCategory === cat
                 ? "bg-primary text-white"
                 : "border border-border text-text-muted hover:border-primary/30 hover:text-text"
@@ -117,6 +138,8 @@ export default function ImageGallery() {
             exit={{ opacity: 0 }}
             className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
             onClick={() => setLightbox(null)}
+            role="dialog"
+            aria-modal="true"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
