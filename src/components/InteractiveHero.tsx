@@ -4,6 +4,7 @@ import { useRef, useEffect, useCallback } from "react";
 import { useTheme } from "next-themes";
 import { ArrowRight } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import ProfileImage from "@/components/ProfileImage";
 
@@ -186,7 +187,23 @@ export default function InteractiveHero() {
 
   return (
     <section className="relative overflow-hidden px-4 py-16 sm:px-6 sm:py-20 lg:px-10">
-      {/* Canvas background */}
+      {/* Photo backdrop with scrim — light mode only, sits under the dots */}
+      <div className="absolute inset-0 dark:hidden" aria-hidden="true">
+        <Image
+          src="/hero-backdrop.jpg"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="object-cover"
+        />
+        {/* Uniform wash so text stays readable over the photo */}
+        <div className="absolute inset-0 bg-canvas/60" />
+        {/* Gradient scrim blending the photo into the page below */}
+        <div className="absolute inset-0 bg-gradient-to-b from-canvas/70 via-canvas/25 to-canvas" />
+      </div>
+
+      {/* Canvas background (interactive dots, above the photo) */}
       <canvas
         ref={canvasRef}
         className="pointer-events-auto absolute inset-0 h-full w-full"
