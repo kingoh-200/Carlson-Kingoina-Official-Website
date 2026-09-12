@@ -244,7 +244,7 @@ function FactCard({
   text: string;
 }) {
   return (
-    <div className="glow-card rounded-xl border border-border p-5 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+    <div className="card-pop glow-card rounded-xl border border-border bg-surface p-5 shadow-sm">
       <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
         {icon}
       </div>

@@ -138,6 +138,56 @@ h2 {
   opacity: 1;
 }
 
+/* ─── Elevated cards that pop on hover ─── */
+.card-pop {
+  position: relative;
+  transition:
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Gradient border that fades in on hover */
+.card-pop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgba(7, 137, 201, 0.55),
+    rgba(99, 188, 229, 0.2) 45%,
+    transparent 75%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+          mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+          mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.card-pop:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 34px -10px rgba(7, 137, 201, 0.22);
+}
+
+.card-pop:hover::after {
+  opacity: 1;
+}
+
+.dark .card-pop:hover {
+  box-shadow:
+    0 14px 34px -10px rgba(2, 6, 23, 0.9),
+    0 0 24px -6px rgba(96, 165, 250, 0.25);
+}
+
 /* ─── Easter egg: click sparkle ─── */
 @keyframes sparkle {
   0% { transform: scale(0) rotate(0deg); opacity: 1; }

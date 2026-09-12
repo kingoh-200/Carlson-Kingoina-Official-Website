@@ -29,9 +29,11 @@ export default function ProjectCard({ project }: { project: Project }) {
     <div
       ref={cardRef}
       onMouseMove={handleMouseMove}
-      className="glow-card group rounded-xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 hover:-translate-y-0.5"
+      className="card-pop glow-card group rounded-xl border border-border bg-surface p-6 shadow-sm"
     >
-      <h3 className="text-lg font-semibold">{project.title}</h3>
+      <h3 className="text-lg font-semibold transition-colors group-hover:text-primary">
+        {project.title}
+      </h3>
       <p className="mt-2 text-sm leading-relaxed text-text-muted">
         {project.description}
       </p>
@@ -39,7 +41,7 @@ export default function ProjectCard({ project }: { project: Project }) {
         {project.tags.map((tag) => (
           <span
             key={tag}
-            className="rounded-md bg-surface-alt px-2.5 py-1 text-xs font-medium text-text-muted transition-all hover:bg-primary/10 hover:text-primary"
+            className="rounded-md border border-border bg-surface-alt px-2.5 py-1 text-xs font-medium text-text-muted transition-colors group-hover:border-primary/20 group-hover:text-text hover:bg-primary/10 hover:text-primary"
           >
             {tag}
           </span>

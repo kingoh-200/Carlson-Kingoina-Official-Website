@@ -6,7 +6,7 @@ interface SkillCardProps {
 
 export function SkillCard({ icon, title, items }: SkillCardProps) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-6 shadow-sm transition-colors hover:border-primary/30">
+    <div className="card-pop rounded-xl border border-border bg-surface p-6 shadow-sm">
       <div className="text-primary">{icon}</div>
       <h3 className="mt-3 font-semibold">{title}</h3>
       <ul className="mt-2 space-y-1 text-sm text-text-muted">

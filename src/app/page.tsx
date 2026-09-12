@@ -76,7 +76,7 @@ export default function Home() {
           <div className="mx-auto w-full max-w-6xl">
             <Link
               href="/gallery"
-              className="group flex items-center gap-4 rounded-2xl border border-border p-6 transition-all hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5"
+              className="card-pop glow-card group flex items-center gap-4 rounded-2xl border border-border bg-surface p-6 shadow-sm"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
                 <Images size={22} />
@@ -98,7 +98,7 @@ export default function Home() {
         <div className="border-y border-border bg-surface-alt px-4 py-14 sm:px-6 lg:px-10">
           <div className="mx-auto grid w-full max-w-6xl gap-8 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] lg:gap-16">
             <SubscribeForm />
-            <div className="flex min-h-56 flex-col items-start justify-center gap-6 rounded-2xl border border-border bg-surface p-8 shadow-sm">
+            <div className="card-pop flex min-h-56 flex-col items-start justify-center gap-6 rounded-2xl border border-border bg-surface p-8 shadow-sm">
               <div>
                 <h3 className="font-semibold">Enjoying the site?</h3>
                 <p className="mt-1 text-sm text-text-muted">
@@ -124,7 +124,7 @@ function SkillItem({
   items: string[];
 }) {
   return (
-    <div className="glow-card group rounded-xl border border-border p-6 transition-all duration-300 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+    <div className="card-pop glow-card group rounded-xl border border-border bg-surface p-6 shadow-sm">
       <div className="text-primary transition-transform duration-300 group-hover:scale-110">{icon}</div>
       <h3 className="mt-3 font-semibold">{title}</h3>
       <ul className="mt-2 space-y-1 text-sm text-text-muted">
