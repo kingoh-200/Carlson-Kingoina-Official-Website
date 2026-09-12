@@ -11,7 +11,7 @@ export default function Hero() {
         <h1 className="mt-4 text-4xl font-bold tracking-tight sm:text-6xl">
           Carlson Kingoina
         </h1>
-        <p className="mt-6 max-w-xl text-lg leading-relaxed text-text-muted">
+        <p className="mt-6 max-w-xl text-base leading-relaxed text-text-muted sm:text-lg">
           A developer and creator building things for the web. I love working
           with modern tools, open source, and turning ideas into products.
         </p>

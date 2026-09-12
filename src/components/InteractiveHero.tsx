@@ -193,7 +193,7 @@ export default function InteractiveHero() {
       />
 
       <div className="relative mx-auto w-full max-w-6xl">
-        <div className="flex flex-col gap-8 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
           <div className="max-w-2xl">
             <motion.p
           initial={{ opacity: 0, y: 12 }}
@@ -215,7 +215,7 @@ export default function InteractiveHero() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
-          className="mt-6 max-w-xl text-lg leading-relaxed text-text-muted"
+          className="mt-5 max-w-xl text-base leading-relaxed text-text-muted sm:mt-6 sm:text-lg"
         >
           A developer and creator building things for the web. I love working
           with modern tools, open source, and turning ideas into products.
@@ -244,7 +244,7 @@ export default function InteractiveHero() {
             initial={{ opacity: 0, scale: 0.9, y: 16 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="order-first mx-auto h-44 w-44 shrink-0 overflow-hidden rounded-full border-4 border-surface bg-surface-alt shadow-2xl shadow-primary/25 ring-2 ring-primary/30 sm:h-52 sm:w-52 lg:order-last lg:mx-0 lg:h-64 lg:w-64"
+            className="order-first mx-auto h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-surface bg-surface-alt shadow-xl shadow-primary/25 ring-2 ring-primary/30 sm:h-44 sm:w-44 lg:order-last lg:mx-0 lg:h-64 lg:w-64"
           >
             <ProfileImage />
           </motion.div>
