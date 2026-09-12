@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { Menu, X, Sun, Moon } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 
 const navLinks = [
@@ -20,6 +20,7 @@ export default function Header() {
   const { theme, setTheme } = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const headerRef = useRef<HTMLElement>(null);
 
   // Avoid hydration mismatch — only read theme after mount
   useEffect(() => setMounted(true), []);
@@ -29,14 +30,23 @@ export default function Header() {
     setMobileOpen(false);
   }, [pathname]);
 
-  // Close with Escape
+  // Close on Escape or tap outside the header
   useEffect(() => {
     if (!mobileOpen) return;
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setMobileOpen(false);
     };
+    const onPointerDown = (e: PointerEvent) => {
+      if (headerRef.current && !headerRef.current.contains(e.target as Node)) {
+        setMobileOpen(false);
+      }
+    };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    document.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      document.removeEventListener("pointerdown", onPointerDown);
+    };
   }, [mobileOpen]);
 
   const isDark = mounted && theme === "dark";
@@ -45,7 +55,10 @@ export default function Header() {
     : "Toggle theme";
 
   return (
-    <header className="sticky top-0 z-50 border-b border-border bg-surface/80 backdrop-blur-md">
+    <header
+      ref={headerRef}
+      className="sticky top-0 z-50 border-b border-border bg-surface/80 backdrop-blur-md"
+    >
       <div className="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6 sm:py-4 lg:px-10">
         {/* Row 1: name — and nav/theme on desktop */}
         <div className="flex items-center justify-between">
@@ -124,31 +137,49 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile dropdown — original expandable menu, left-aligned */}
+      {/* Mobile dropdown — floating panel that overlays the page instead of
+          pushing content down. Absolutely positioned under the sticky header. */}
       <div
         id="mobile-nav"
         className={clsx(
-          "overflow-hidden transition-all duration-300 ease-in-out md:hidden",
-          mobileOpen ? "max-h-80 border-t border-border" : "max-h-0"
+          "absolute inset-x-0 top-full z-40 px-4 pt-2 transition-all duration-200 ease-out md:hidden",
+          mobileOpen
+            ? "pointer-events-auto translate-y-0 opacity-100"
+            : "pointer-events-none -translate-y-2 opacity-0"
         )}
       >
-        <ul className="mx-auto w-full max-w-6xl px-4 py-3 sm:px-6 lg:px-10">
-          {navLinks.map((link) => (
-            <li key={link.href}>
-              <Link
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                aria-current={pathname === link.href ? "page" : undefined}
-                className={clsx(
-                  "block py-2.5 text-[15px] font-medium transition-colors hover:text-primary",
-                  pathname === link.href ? "text-primary" : "text-text-muted"
-                )}
-              >
-                {link.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        <div className="mx-auto w-full max-w-sm rounded-xl border border-border bg-surface p-2 shadow-xl shadow-black/10">
+          <ul>
+            {navLinks.map((link) => {
+              const isActive = pathname === link.href;
+              return (
+                <li key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    aria-current={isActive ? "page" : undefined}
+                    className={clsx(
+                      "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors",
+                      isActive
+                        ? "bg-primary/5 text-primary"
+                        : "text-text-muted hover:bg-surface-alt hover:text-primary"
+                    )}
+                  >
+                    {/* Active-page dot indicator */}
+                    <span
+                      aria-hidden="true"
+                      className={clsx(
+                        "h-1.5 w-1.5 shrink-0 rounded-full transition-colors duration-300",
+                        isActive ? "bg-primary" : "bg-transparent"
+                      )}
+                    />
+                    {link.label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
       </div>
     </header>
   );
