@@ -137,18 +137,18 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile dropdown — floating panel that overlays the page instead of
-          pushing content down. Absolutely positioned under the sticky header. */}
+      {/* Mobile dropdown — compact, translucent card anchored under the
+          hamburger button. Floats above the page without pushing content. */}
       <div
         id="mobile-nav"
         className={clsx(
-          "absolute inset-x-0 top-full z-40 px-4 pt-2 transition-all duration-200 ease-out md:hidden",
+          "absolute left-0 top-full z-40 w-full px-4 pt-2 transition-all duration-200 ease-out md:hidden",
           mobileOpen
             ? "pointer-events-auto translate-y-0 opacity-100"
             : "pointer-events-none -translate-y-2 opacity-0"
         )}
       >
-        <div className="mx-auto w-full max-w-sm rounded-xl border border-border bg-surface p-2 shadow-xl shadow-black/10">
+        <div className="w-56 max-w-[70vw] rounded-2xl border border-border/60 bg-surface/90 p-1.5 shadow-2xl shadow-black/10 ring-1 ring-black/[0.04] backdrop-blur-xl">
           <ul>
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
@@ -159,10 +159,10 @@ export default function Header() {
                     onClick={() => setMobileOpen(false)}
                     aria-current={isActive ? "page" : undefined}
                     className={clsx(
-                      "flex items-center gap-2.5 rounded-lg px-3 py-2.5 text-[15px] font-medium transition-colors",
+                      "flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition-colors",
                       isActive
-                        ? "bg-primary/5 text-primary"
-                        : "text-text-muted hover:bg-surface-alt hover:text-primary"
+                        ? "bg-primary/10 text-primary"
+                        : "text-text-muted hover:bg-surface-alt/80 hover:text-text"
                     )}
                   >
                     {/* Active-page dot indicator */}
